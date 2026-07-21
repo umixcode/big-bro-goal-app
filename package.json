@@ -1,0 +1,45 @@
+{
+  "name": "big-bro",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
+    "@hookform/resolvers": "^5.4.0",
+    "@supabase/supabase-js": "^2.110.7",
+    "@tanstack/react-query": "^5.101.3",
+    "dayjs": "^1.11.21",
+    "expo": "~57.0.7",
+    "expo-constants": "~57.0.6",
+    "expo-dev-client": "~57.0.7",
+    "expo-linking": "~57.0.3",
+    "expo-router": "~57.0.7",
+    "expo-secure-store": "~57.0.1",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-hook-form": "^7.82.0",
+    "react-native": "0.86.0",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "4.25.2",
+    "react-native-url-polyfill": "^4.0.0",
+    "react-native-worklets": "0.10.0",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "@types/react": "~19.2.2",
+    "dotenv": "^17.4.2",
+    "tsx": "^4.23.1",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo start --dev-client --android",
+    "ios": "expo start --dev-client --ios",
+    "web": "expo start --web",
+    "import:workout-program": "tsx scripts/import-workout-program.ts"
+  },
+  "private": true
+}
