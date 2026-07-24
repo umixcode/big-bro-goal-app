@@ -36,3 +36,18 @@ export const typography = {
   body: { fontSize: 16, fontWeight: '400' as const, color: colors.textPrimary },
   caption: { fontSize: 13, fontWeight: '400' as const, color: colors.textSecondary },
 };
+
+export const calendarTheme = {
+  backgroundColor: colors.surface,
+  calendarBackground: colors.surface,
+  textSectionTitleColor: colors.textSecondary,
+  dayTextColor: colors.textPrimary,
+  todayTextColor: colors.accent,
+  monthTextColor: colors.textPrimary,
+  selectedDayBackgroundColor: colors.accent,
+  selectedDayTextColor: '#fff',
+  dotColor: colors.accent,
+  selectedDotColor: '#fff',
+  arrowColor: colors.accent,
+  textDisabledColor: colors.textMuted,
+} as const;

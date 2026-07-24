@@ -1,38 +1,78 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import dayjs from 'dayjs';
+import { View, Text, ScrollView, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useProfile } from '../../src/hooks/useProfile';
-import { Card } from '../../src/components/ui/Card';
+import { DhikrCounter } from '../../src/components/dhikr/DhikrCounter';
+import { PlannerTaskList } from '../../src/components/planner/PlannerTaskList';
+import { JournalComposer } from '../../src/components/journal/JournalComposer';
+import { ComingSoonCard } from '../../src/components/dashboard/ComingSoonCard';
+import { TodaysGoalsCard } from '../../src/components/goals/TodaysGoalsCard';
+import { MiniCalendarCard } from '../../src/components/calendar/MiniCalendarCard';
 import { supabase } from '../../src/api/supabaseClient';
-import { colors, spacing, typography } from '../../src/lib/theme';
+import { colors, radii, spacing, typography } from '../../src/lib/theme';
 
-const dashboardLinks = [
-  { href: '/(tabs)/trackers', icon: 'moon', label: 'Sleep, Food, Water & Weight' },
+const navPills = [
+  { href: '/(tabs)/trackers', icon: 'moon', label: 'Sleep' },
+  { href: '/(tabs)/trackers', icon: 'restaurant', label: 'Food' },
   { href: '/(tabs)/workout', icon: 'barbell', label: 'Workout' },
-  { href: '/(tabs)/calendar', icon: 'calendar', label: 'Calendar & Planner' },
-  { href: '/(tabs)/brain', icon: 'book', label: 'Brain Tracker' },
-  { href: '/(tabs)/mentor', icon: 'sparkles', label: 'AI Mentor' },
 ] as const;
+
+const BREAKPOINT = 700;
 
 export default function DashboardScreen() {
   const router = useRouter();
   const { data: profile } = useProfile();
+  const { width } = useWindowDimensions();
+  const isWide = width >= BREAKPOINT;
+  const today = dayjs().format('YYYY-MM-DD');
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={typography.title}>
         {profile?.full_name ? `Welcome back, ${profile.full_name}` : 'Welcome back'}
       </Text>
-      <Text style={[typography.caption, { marginBottom: spacing.lg }]}>Let's level up today.</Text>
+      <Text style={[typography.caption, { marginBottom: spacing.md }]}>Let's level up today.</Text>
 
-      {dashboardLinks.map((link) => (
-        <Card key={link.href} onPress={() => router.push(link.href)} style={{ marginBottom: spacing.sm }}>
-          <View style={styles.row}>
-            <Ionicons name={link.icon as any} size={22} color={colors.accent} />
-            <Text style={[typography.body, { marginLeft: spacing.sm }]}>{link.label}</Text>
+      <View style={styles.navRow}>
+        {navPills.map((pill) => (
+          <Pressable key={pill.label} style={styles.navPill} onPress={() => router.push(pill.href)}>
+            <Ionicons name={pill.icon} size={16} color={colors.accent} />
+            <Text style={styles.navPillText}>{pill.label}</Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <View style={{ marginBottom: spacing.sm }}>
+        <DhikrCounter />
+      </View>
+
+      <View style={isWide ? styles.columnsRow : undefined}>
+        <View style={[styles.column, isWide && styles.columnLeft]}>
+          <JournalComposer />
+          <ComingSoonCard title="Salah Tracker" variant="dots" />
+          <View style={styles.sideBySide}>
+            <ComingSoonCard title="Water Intake" variant="ring" style={styles.half} />
+            <ComingSoonCard title="Calorie Intake" variant="ring" style={styles.half} />
           </View>
-        </Card>
-      ))}
+          <MiniCalendarCard />
+          <TodaysGoalsCard />
+          <View style={styles.sideBySide}>
+            <ComingSoonCard title="Currently Reading" style={styles.half} />
+            <ComingSoonCard title="Weight Graph" style={styles.half} />
+          </View>
+        </View>
+
+        <View style={[styles.column, isWide && styles.columnRight]}>
+          <ComingSoonCard title="Salah Time" variant="rows" rows={['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']} />
+          <PlannerTaskList date={today} />
+        </View>
+      </View>
+
+      <Pressable style={styles.brainLink} onPress={() => router.push('/(tabs)/brain')}>
+        <Ionicons name="book" size={18} color={colors.accent} />
+        <Text style={[typography.body, { marginLeft: spacing.sm }]}>Brain Tracker</Text>
+      </Pressable>
 
       <Pressable style={styles.signOut} onPress={() => supabase.auth.signOut()}>
         <Text style={{ color: colors.danger }}>Sign out</Text>
@@ -47,12 +87,61 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     padding: spacing.lg,
   },
-  row: {
+  navRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  navPill: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radii.full,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  navPillText: {
+    color: colors.textPrimary,
+    marginLeft: spacing.xs,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  columnsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+  },
+  column: {
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  columnLeft: {
+    flex: 62,
+  },
+  columnRight: {
+    flex: 38,
+  },
+  sideBySide: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  half: {
+    flex: 1,
+  },
+  brainLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   signOut: {
-    marginTop: spacing.xl,
+    marginTop: spacing.lg,
     alignSelf: 'center',
     padding: spacing.md,
   },
