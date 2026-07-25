@@ -7,6 +7,9 @@ import { DhikrCounter } from '../../src/components/dhikr/DhikrCounter';
 import { PlannerTaskList } from '../../src/components/planner/PlannerTaskList';
 import { JournalComposer } from '../../src/components/journal/JournalComposer';
 import { ComingSoonCard } from '../../src/components/dashboard/ComingSoonCard';
+import { WaterRingCard } from '../../src/components/dashboard/WaterRingCard';
+import { CalorieWedgeCard } from '../../src/components/dashboard/CalorieWedgeCard';
+import { WeightTrendCard } from '../../src/components/dashboard/WeightTrendCard';
 import { TodaysGoalsCard } from '../../src/components/goals/TodaysGoalsCard';
 import { MiniCalendarCard } from '../../src/components/calendar/MiniCalendarCard';
 import { supabase } from '../../src/api/supabaseClient';
@@ -52,14 +55,14 @@ export default function DashboardScreen() {
           <JournalComposer />
           <ComingSoonCard title="Salah Tracker" variant="dots" />
           <View style={styles.sideBySide}>
-            <ComingSoonCard title="Water Intake" variant="ring" style={styles.half} />
-            <ComingSoonCard title="Calorie Intake" variant="ring" style={styles.half} />
+            <WaterRingCard style={styles.half} />
+            <CalorieWedgeCard style={styles.half} />
           </View>
           <MiniCalendarCard />
           <TodaysGoalsCard />
           <View style={styles.sideBySide}>
             <ComingSoonCard title="Currently Reading" style={styles.half} />
-            <ComingSoonCard title="Weight Graph" style={styles.half} />
+            <WeightTrendCard style={styles.half} />
           </View>
         </View>
 
