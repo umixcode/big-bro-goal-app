@@ -3,24 +3,28 @@ import { SleepCard } from '../../../src/components/trackers/SleepCard';
 import { FoodCard } from '../../../src/components/trackers/FoodCard';
 import { WaterCard } from '../../../src/components/trackers/WaterCard';
 import { WeightCard } from '../../../src/components/trackers/WeightCard';
+import { StepsCard } from '../../../src/components/trackers/StepsCard';
 import { useUserGoals } from '../../../src/hooks/useUserGoals';
 import { useDailyTargets } from '../../../src/hooks/useDailyTargets';
+import { useHealthKitSync } from '../../../src/hooks/useHealthKitSync';
 import { colors, spacing, typography } from '../../../src/lib/theme';
 
 export default function TrackersScreen() {
   const { data: userGoals } = useUserGoals();
   const { targets } = useDailyTargets();
+  useHealthKitSync();
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
       <Text style={typography.title}>Trackers</Text>
       <Text style={[typography.caption, { marginBottom: spacing.md }]}>
-        Log today's sleep, food, water, and weight.
+        Log today's sleep, food, water, steps, and weight.
       </Text>
 
       {targets ? (
         <>
           <SleepCard sleepGoalHours={targets.sleepGoalHours} />
+          <StepsCard stepGoal={targets.stepGoal} />
           <FoodCard
             calorieGoal={targets.calorieGoal}
             proteinGoal={targets.proteinG}

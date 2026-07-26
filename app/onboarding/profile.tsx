@@ -55,7 +55,7 @@ export default function OnboardingProfileScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
       <Text style={typography.title}>Tell us about you</Text>
       <Text style={[typography.caption, { marginBottom: spacing.lg }]}>
         This powers your calorie, macro, and water goals.
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.onAccent,
     fontWeight: '600',
     fontSize: 16,
   },

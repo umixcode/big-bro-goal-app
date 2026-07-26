@@ -93,5 +93,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  buttonText: { color: '#fff', fontWeight: '600' },
+  buttonText: { color: colors.onAccent, fontWeight: '600' },
 });

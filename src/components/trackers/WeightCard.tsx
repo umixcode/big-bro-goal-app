@@ -2,6 +2,7 @@ import { useState } from 'react';
 import dayjs from 'dayjs';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Card } from '../ui/Card';
+import { SyncedBadge } from '../ui/SyncedBadge';
 import { useUpsertWeightLog, useWeightLogs } from '../../hooks/useWeightLogs';
 import { useProfile, useUpsertProfile } from '../../hooks/useProfile';
 import { formatWeight, parseWeightToKg } from '../../lib/units';
@@ -37,6 +38,7 @@ export function WeightCard() {
       <Text style={[typography.caption, { marginTop: spacing.xs }]}>
         {latest ? `Latest: ${formatWeight(latest.weight_kg, unitsPreference)} ${unitLabel} on ${latest.date}` : 'No entries yet'}
       </Text>
+      {latest?.source === 'healthkit' && <SyncedBadge />}
 
       {chronological.length > 1 && (
         <View style={styles.sparkline}>
@@ -84,5 +86,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  buttonText: { color: '#fff', fontWeight: '600' },
+  buttonText: { color: colors.onAccent, fontWeight: '600' },
 });

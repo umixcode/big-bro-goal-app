@@ -17,6 +17,7 @@ export interface DailyTargets {
   carbsG: number;
   waterGoalMl: number;
   sleepGoalHours: number;
+  stepGoal: number;
 }
 
 export function useDailyTargets(): { targets: DailyTargets | null; isLoading: boolean } {
@@ -49,6 +50,7 @@ export function useDailyTargets(): { targets: DailyTargets | null; isLoading: bo
       carbsG: goals.carbs_goal_override_g ?? macros.carbsG,
       waterGoalMl: goals.water_goal_override_ml ?? calculateWaterGoalMl(desiredWeightKg, profile.activity_level),
       sleepGoalHours: goals.sleep_goal_hours,
+      stepGoal: goals.step_goal,
     };
   }, [profile, goals]);
 

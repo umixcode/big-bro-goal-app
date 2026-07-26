@@ -4,7 +4,8 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Calendar, type DateData } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { useCalendarEvents, useCreateEvent, useDeleteEvent } from '../../hooks/useCalendarEvents';
-import type { CalendarEvent } from '../../api/calendarEvents';
+import { useDeviceCalendarEvents } from '../../hooks/useDeviceCalendarEvents';
+import { toDisplayEvents, buildMarkedDates, type DisplayEvent } from '../../lib/calendarMerge';
 import { Card } from '../ui/Card';
 import { ChipSelect } from '../ui/ChipSelect';
 import { calendarTheme, colors, radii, spacing, typography } from '../../lib/theme';
@@ -16,8 +17,12 @@ const timingOptions: { value: TimingMode; label: string }[] = [
   { value: 'timed', label: 'Set time' },
 ];
 
+const WINDOW_START = dayjs().subtract(30, 'day').toDate();
+const WINDOW_END = dayjs().add(90, 'day').toDate();
+
 export function CalendarView() {
   const { data: events = [] } = useCalendarEvents();
+  const { data: deviceEvents = [] } = useDeviceCalendarEvents(WINDOW_START, WINDOW_END);
   const createEvent = useCreateEvent();
   const deleteEvent = useDeleteEvent();
 
@@ -26,23 +31,21 @@ export function CalendarView() {
   const [timing, setTiming] = useState<TimingMode>('all_day');
   const [time, setTime] = useState('');
 
+  const displayEvents = useMemo(() => toDisplayEvents(events, deviceEvents), [events, deviceEvents]);
+
   const eventsByDate = useMemo(() => {
-    const map: Record<string, CalendarEvent[]> = {};
-    for (const event of events) {
-      const date = dayjs(event.start_at).format('YYYY-MM-DD');
+    const map: Record<string, DisplayEvent[]> = {};
+    for (const event of displayEvents) {
+      const date = dayjs(event.startAt).format('YYYY-MM-DD');
       (map[date] ??= []).push(event);
     }
     return map;
-  }, [events]);
+  }, [displayEvents]);
 
-  const markedDates = useMemo(() => {
-    const marks: Record<string, { marked?: boolean; selected?: boolean; selectedColor?: string }> = {};
-    for (const date of Object.keys(eventsByDate)) {
-      marks[date] = { marked: true };
-    }
-    marks[selectedDate] = { ...(marks[selectedDate] ?? {}), selected: true, selectedColor: colors.accent };
-    return marks;
-  }, [eventsByDate, selectedDate]);
+  const markedDates = useMemo(
+    () => buildMarkedDates(displayEvents, selectedDate),
+    [displayEvents, selectedDate]
+  );
 
   const dayEvents = eventsByDate[selectedDate] ?? [];
 
@@ -89,12 +92,15 @@ export function CalendarView() {
               <View style={{ flex: 1 }}>
                 <Text style={typography.body}>{event.title}</Text>
                 <Text style={typography.caption}>
-                  {event.all_day ? 'All day' : dayjs(event.start_at).format('h:mm A')}
+                  {event.allDay ? 'All day' : dayjs(event.startAt).format('h:mm A')}
+                  {event.source === 'device' ? ` · ${event.deviceCalendarTitle}` : ''}
                 </Text>
               </View>
-              <Pressable onPress={() => deleteEvent.mutate(event.id)} hitSlop={8}>
-                <Ionicons name="close" size={18} color={colors.textMuted} />
-              </Pressable>
+              {event.source === 'app' && (
+                <Pressable onPress={() => deleteEvent.mutate(event.id)} hitSlop={8}>
+                  <Ionicons name="close" size={18} color={colors.textMuted} />
+                </Pressable>
+              )}
             </View>
           ))}
         </View>
@@ -155,7 +161,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   addButtonText: {
-    color: '#fff',
+    color: colors.onAccent,
     fontWeight: '600',
     fontSize: 16,
   },

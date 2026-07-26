@@ -31,7 +31,7 @@ export default function DashboardScreen() {
   const today = dayjs().format('YYYY-MM-DD');
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
       <Text style={typography.title}>
         {profile?.full_name ? `Welcome back, ${profile.full_name}` : 'Welcome back'}
       </Text>
@@ -60,10 +60,7 @@ export default function DashboardScreen() {
           </View>
           <MiniCalendarCard />
           <TodaysGoalsCard />
-          <View style={styles.sideBySide}>
-            <ComingSoonCard title="Currently Reading" style={styles.half} />
-            <WeightTrendCard style={styles.half} />
-          </View>
+          <WeightTrendCard />
         </View>
 
         <View style={[styles.column, isWide && styles.columnRight]}>
@@ -106,10 +103,9 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   navPillText: {
+    ...typography.eyebrow,
     color: colors.textPrimary,
     marginLeft: spacing.xs,
-    fontSize: 13,
-    fontWeight: '600',
   },
   columnsRow: {
     flexDirection: 'row',

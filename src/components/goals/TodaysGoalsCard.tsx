@@ -22,7 +22,7 @@ export function TodaysGoalsCard() {
 
   return (
     <Card onPress={() => router.push('/(tabs)/calendar')}>
-      <Text style={typography.heading}>Today's Goals</Text>
+      <Text style={typography.eyebrow}>Today's Goals</Text>
       <View style={{ marginTop: spacing.sm }}>
         {active.length === 0 && <Text style={typography.caption}>No active goals yet.</Text>}
         {active.map((goal) => (

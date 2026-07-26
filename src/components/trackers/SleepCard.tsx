@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Card } from '../ui/Card';
 import { CircularProgressRing } from '../ui/CircularProgressRing';
+import { SyncedBadge } from '../ui/SyncedBadge';
 import { useSleepLog, useUpsertSleepLog } from '../../hooks/useSleepLogs';
 import { calculateSleepScore } from '../../lib/formulas';
 import { colors, radii, spacing, typography } from '../../lib/theme';
@@ -41,6 +42,7 @@ export function SleepCard({ sleepGoalHours }: SleepCardProps) {
   return (
     <Card>
       <Text style={typography.heading}>Sleep</Text>
+      {log?.source === 'healthkit' && <SyncedBadge />}
       <View style={styles.body}>
         <CircularProgressRing progress={progress} size={100} strokeWidth={10}>
           <Text style={styles.ringValue}>{(totalMinutes / 60).toFixed(1)}h</Text>
@@ -90,5 +92,5 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   button: { backgroundColor: colors.accent, borderRadius: radii.md, padding: spacing.sm, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: '600' },
+  buttonText: { color: colors.onAccent, fontWeight: '600' },
 });

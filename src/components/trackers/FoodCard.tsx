@@ -153,5 +153,5 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   button: { backgroundColor: colors.accent, borderRadius: radii.md, padding: spacing.sm, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: '600' },
+  buttonText: { color: colors.onAccent, fontWeight: '600' },
 });

@@ -25,7 +25,7 @@ export function CalorieWedgeCard({ style }: { style?: ViewStyle }) {
 
   return (
     <Card onPress={() => router.push('/(tabs)/trackers')} style={style}>
-      <Text style={typography.heading}>Calorie Intake</Text>
+      <Text style={typography.eyebrow}>Calorie Intake</Text>
       <View style={styles.wedgeWrap}>
         <MacroWedgeChart
           size={64}

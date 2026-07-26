@@ -8,7 +8,7 @@ export function useWeightLogs(limit = 14) {
 export function useUpsertWeightLog() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: { date: string; weight_kg: number }) => upsertWeightLog(input),
+    mutationFn: (input: { date: string; weight_kg: number; source?: 'healthkit' | 'manual' }) => upsertWeightLog(input),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['weightLogs'] }),
   });
 }

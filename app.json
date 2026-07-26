@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bigbro.app"
+      "bundleIdentifier": "com.umarmemon.bigbro"
     },
     "android": {
       "package": "com.bigbro.app",
@@ -27,7 +27,21 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "Big Bro reads your sleep, weight, and step data from Apple Health so your trackers stay up to date automatically.",
+          "NSHealthUpdateUsageDescription": false,
+          "background": false
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Big Bro reads events from your Apple Calendar so they show up alongside your goals, workouts, and prayer times."
+        }
+      ]
     ]
   }
 }

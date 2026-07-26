@@ -31,7 +31,7 @@ export function PlannerTaskList({ date, compact = false }: PlannerTaskListProps)
 
   return (
     <Card>
-      <Text style={typography.heading}>Planner</Text>
+      <Text style={typography.eyebrow}>Planner</Text>
       <View style={{ marginTop: spacing.sm }}>
         {tasks.length === 0 && <Text style={typography.caption}>Nothing planned yet.</Text>}
         {tasks.map((task) => (
@@ -75,7 +75,7 @@ export function PlannerTaskList({ date, compact = false }: PlannerTaskListProps)
           returnKeyType="done"
         />
         <Pressable style={styles.addButton} onPress={onAdd}>
-          <Ionicons name="add" size={20} color="#fff" />
+          <Ionicons name="add" size={20} color={colors.onAccent} />
         </Pressable>
       </View>
     </Card>

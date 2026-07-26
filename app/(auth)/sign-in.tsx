@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.onAccent,
     fontWeight: '600',
     fontSize: 16,
   },

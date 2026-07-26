@@ -17,7 +17,7 @@ export function WaterRingCard({ style }: { style?: ViewStyle }) {
 
   return (
     <Card onPress={() => router.push('/(tabs)/trackers')} style={style}>
-      <Text style={typography.heading}>Water Intake</Text>
+      <Text style={typography.eyebrow}>Water Intake</Text>
       <View style={styles.ringWrap}>
         <CircularProgressRing progress={progress} size={64} strokeWidth={7}>
           <Text style={styles.value}>{totalMl}</Text>

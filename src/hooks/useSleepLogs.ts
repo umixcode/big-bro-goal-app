@@ -8,7 +8,17 @@ export function useSleepLog(date: string) {
 export function useUpsertSleepLog(date: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (input: { total_minutes: number; score?: number | null }) => upsertSleepLog({ date, ...input }),
+    mutationFn: (input: {
+      total_minutes: number;
+      score?: number | null;
+      rem_minutes?: number | null;
+      light_minutes?: number | null;
+      deep_minutes?: number | null;
+      awake_minutes?: number | null;
+      start_time?: string | null;
+      end_time?: string | null;
+      source?: 'healthkit' | 'manual';
+    }) => upsertSleepLog({ date, ...input }),
     onSuccess: (data) => queryClient.setQueryData(['sleepLog', date], data),
   });
 }

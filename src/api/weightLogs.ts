@@ -23,13 +23,18 @@ export async function listWeightLogs(limit = 14): Promise<WeightLog[]> {
   return data ?? [];
 }
 
-export async function upsertWeightLog(input: { date: string; weight_kg: number }): Promise<WeightLog> {
+export async function upsertWeightLog(input: {
+  date: string;
+  weight_kg: number;
+  source?: 'healthkit' | 'manual';
+}): Promise<WeightLog> {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) throw new Error('Not signed in');
 
+  const { source, ...rest } = input;
   const { data, error } = await supabase
     .from('weight_logs')
-    .upsert({ user_id: userData.user.id, source: 'manual', ...input }, { onConflict: 'user_id,date' })
+    .upsert({ user_id: userData.user.id, source: source ?? 'manual', ...rest }, { onConflict: 'user_id,date' })
     .select()
     .single();
 

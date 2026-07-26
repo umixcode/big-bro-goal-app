@@ -34,7 +34,7 @@ export function JournalComposer() {
 
   return (
     <Card>
-      <Text style={typography.heading}>Journal</Text>
+      <Text style={typography.eyebrow}>Journal</Text>
       <Text style={[typography.caption, { marginTop: spacing.xs, marginBottom: spacing.sm }]}>
         How's it going today?
       </Text>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.onAccent,
     fontWeight: '600',
     fontSize: 16,
   },

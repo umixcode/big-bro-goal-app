@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   labelSelected: {
-    color: '#fff',
+    color: colors.onAccent,
     fontWeight: '600',
   },
 });

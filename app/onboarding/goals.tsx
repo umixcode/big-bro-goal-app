@@ -44,7 +44,7 @@ export default function OnboardingGoalsScreen() {
   const isSaving = upsertGoals.isPending || upsertProfile.isPending;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
       <Text style={typography.title}>Set your goals</Text>
       <Text style={[typography.caption, { marginBottom: spacing.lg }]}>
         We'll calculate what you need to do daily to hit these.
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   buttonText: {
-    color: '#fff',
+    color: colors.onAccent,
     fontWeight: '600',
     fontSize: 16,
   },

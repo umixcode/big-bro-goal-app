@@ -28,7 +28,7 @@ export default function CalendarScreen() {
   const [dailySection, setDailySection] = useState<DailySection>('planner');
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
       <Text style={typography.title}>Calendar</Text>
       <View style={styles.switcher}>
         <ChipSelect options={tabOptions} value={tab} onChange={setTab} />

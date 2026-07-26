@@ -11,7 +11,7 @@ export function DhikrCounter() {
   return (
     <Card style={styles.card}>
       <View>
-        <Text style={typography.heading}>Dhikr</Text>
+        <Text style={typography.eyebrow}>Dhikr</Text>
         <Text style={[typography.caption, { marginTop: spacing.xs }]}>Today's count</Text>
       </View>
       <Pressable
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   count: {
-    color: '#fff',
+    color: colors.onAccent,
     fontSize: 20,
     fontWeight: '700',
   },

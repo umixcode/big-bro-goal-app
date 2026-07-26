@@ -15,7 +15,7 @@ interface ComingSoonCardProps {
 export function ComingSoonCard({ title, variant = 'plain', rows, style }: ComingSoonCardProps) {
   return (
     <Card style={style}>
-      <Text style={typography.heading}>{title}</Text>
+      <Text style={typography.eyebrow}>{title}</Text>
 
       {variant === 'dots' && (
         <View style={styles.dotsRow}>
