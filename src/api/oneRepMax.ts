@@ -1,3 +1,4 @@
+import NetInfo from '@react-native-community/netinfo';
 import { supabase } from './supabaseClient';
 import { estimateOneRepMax } from '../lib/formulas';
 import { lbToKg } from '../lib/units';
@@ -16,8 +17,9 @@ export interface OneRepMaxLog {
 export async function getCurrentOneRepMax(
   exerciseName: string = BENCH_PRESS_EXERCISE_NAME
 ): Promise<OneRepMaxLog | null> {
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return null;
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) return null;
+  const userData = { user: sessionData.session.user };
 
   const { data, error } = await supabase
     .from('one_rep_max_logs')
@@ -36,8 +38,9 @@ export async function listOneRepMaxHistory(
   exerciseName: string = BENCH_PRESS_EXERCISE_NAME,
   limit = 20
 ): Promise<OneRepMaxLog[]> {
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return [];
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) return [];
+  const userData = { user: sessionData.session.user };
 
   const { data, error } = await supabase
     .from('one_rep_max_logs')
@@ -62,9 +65,19 @@ export interface MaybeRecordOneRepMaxInput {
 // Converts to kg (canonical unit for this table), computes the Epley estimate,
 // and inserts a new row only if it beats the current best. Returns the new row
 // when a new best was recorded, else null.
+//
+// This inherently needs the server — there's no meaningful "offline" answer
+// to "is this a new record" without a local copy of every past 1RM, which
+// isn't worth replicating for this one feature. So rather than attempt it
+// and let the request time out, skip it outright when there's no
+// connectivity; the set itself is still saved separately either way.
 export async function maybeRecordOneRepMax(input: MaybeRecordOneRepMaxInput): Promise<OneRepMaxLog | null> {
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) throw new Error('Not signed in');
+  const netState = await NetInfo.fetch();
+  if (netState.isConnected === false || netState.isInternetReachable === false) return null;
+
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (!sessionData.session) throw new Error('Not signed in');
+  const userData = { user: sessionData.session.user };
 
   const weightKg = input.weightUnit === 'kg' ? input.weight : lbToKg(input.weight);
   const estimate = estimateOneRepMax(weightKg, input.reps);

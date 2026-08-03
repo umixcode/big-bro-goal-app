@@ -42,12 +42,16 @@ export function toDisplayEvents(appEvents: CalendarEvent[], deviceEvents: Device
 
 export function buildMarkedDates(
   displayEvents: DisplayEvent[],
-  selectedDate: string
+  selectedDate: string,
+  actionDates: string[] = []
 ): Record<string, { marked?: boolean; selected?: boolean; selectedColor?: string }> {
   const marks: Record<string, { marked?: boolean; selected?: boolean; selectedColor?: string }> = {};
   for (const event of displayEvents) {
     const date = dayjs(event.startAt).format('YYYY-MM-DD');
     marks[date] = { marked: true };
+  }
+  for (const date of actionDates) {
+    marks[date] = { ...(marks[date] ?? {}), marked: true };
   }
   marks[selectedDate] = { ...(marks[selectedDate] ?? {}), selected: true, selectedColor: colors.accent };
   return marks;

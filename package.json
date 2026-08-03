@@ -6,17 +6,29 @@
     "@expo/vector-icons": "^15.0.2",
     "@hookform/resolvers": "^5.4.0",
     "@kingstinct/react-native-healthkit": "^14.0.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/netinfo": "12.0.1",
     "@supabase/supabase-js": "^2.110.7",
+    "@tanstack/query-async-storage-persister": "^5.101.4",
     "@tanstack/react-query": "^5.101.3",
+    "@tanstack/react-query-persist-client": "^5.101.4",
+    "adhan": "^4.4.4",
     "dayjs": "^1.11.21",
     "expo": "~57.0.7",
+    "expo-background-task": "~57.0.6",
     "expo-calendar": "~57.0.1",
     "expo-constants": "~57.0.6",
+    "expo-crypto": "~57.0.1",
     "expo-dev-client": "~57.0.7",
+    "expo-file-system": "~57.0.1",
+    "expo-image-picker": "~57.0.7",
     "expo-linking": "~57.0.3",
+    "expo-location": "^57.0.6",
+    "expo-notifications": "~57.0.8",
     "expo-router": "~57.0.7",
     "expo-secure-store": "~57.0.1",
     "expo-status-bar": "~57.0.1",
+    "expo-task-manager": "~57.0.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.82.0",
@@ -35,6 +47,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@bacons/apple-targets": "^5.0.0",
     "@types/node": "^26.1.1",
     "@types/react": "~19.2.2",
     "dotenv": "^17.4.2",
@@ -46,7 +59,8 @@
     "android": "expo start --dev-client --android",
     "ios": "expo start --dev-client --ios",
     "web": "expo start --web",
-    "import:workout-program": "tsx scripts/import-workout-program.ts"
+    "import:workout-program": "tsx scripts/import-workout-program.ts",
+    "release:ios": "tsx scripts/write-build-date.ts && expo run:ios --configuration Release"
   },
   "private": true
 }

@@ -1,7 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Card } from '../ui/Card';
-import { colors, spacing, typography } from '../../lib/theme';
+import { spacing, workoutTheme } from '../../lib/theme';
 
 interface ProgramDayCardProps {
   dayName: string;
@@ -11,19 +10,41 @@ interface ProgramDayCardProps {
 
 export function ProgramDayCard({ dayName, exerciseCount, onPress }: ProgramDayCardProps) {
   return (
-    <Card onPress={onPress} style={styles.card}>
-      <View style={styles.row}>
-        <View>
-          <Text style={typography.heading}>{dayName}</Text>
-          <Text style={typography.caption}>{exerciseCount} exercises</Text>
-        </View>
-        <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
+    <Pressable style={styles.card} onPress={onPress}>
+      <View>
+        <Text style={styles.dayName}>{dayName}</Text>
+        <Text style={styles.exerciseCount}>{exerciseCount} exercises</Text>
       </View>
-    </Card>
+      <Ionicons name="chevron-forward" size={20} color={workoutTheme.accent} />
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { marginBottom: spacing.sm },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: workoutTheme.border,
+    borderRadius: 14,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.sm,
+    backgroundColor: workoutTheme.surface,
+  },
+  dayName: {
+    fontFamily: workoutTheme.fontSerif,
+    fontSize: 20,
+    fontWeight: '700',
+    color: workoutTheme.textPrimary,
+  },
+  exerciseCount: {
+    fontFamily: workoutTheme.fontMono,
+    fontSize: 11,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    color: workoutTheme.textMuted,
+    marginTop: 2,
+  },
 });

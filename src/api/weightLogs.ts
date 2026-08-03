@@ -23,6 +23,29 @@ export async function listWeightLogs(limit = 14): Promise<WeightLog[]> {
   return data ?? [];
 }
 
+// The earliest-ever log, used for a "since you started" delta rather than
+// a delta relative to whatever window `listWeightLogs` happens to return.
+export async function getFirstWeightLog(): Promise<WeightLog | null> {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return null;
+
+  const { data, error } = await supabase
+    .from('weight_logs')
+    .select('*')
+    .eq('user_id', userData.user.id)
+    .order('date', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteWeightLog(id: string): Promise<void> {
+  const { error } = await supabase.from('weight_logs').delete().eq('id', id);
+  if (error) throw error;
+}
+
 export async function upsertWeightLog(input: {
   date: string;
   weight_kg: number;

@@ -10,7 +10,11 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.umarmemon.bigbro"
+      "bundleIdentifier": "com.umarmemon.bigbro",
+      "appleTeamId": "9RJ68C6G85",
+      "infoPlist": {
+        "NSSupportsLiveActivities": true
+      }
     },
     "android": {
       "package": "com.bigbro.app",
@@ -31,7 +35,7 @@
       [
         "@kingstinct/react-native-healthkit",
         {
-          "NSHealthShareUsageDescription": "Big Bro reads your sleep, weight, and step data from Apple Health so your trackers stay up to date automatically.",
+          "NSHealthShareUsageDescription": "Big Bro reads your sleep, weight, step, and active energy data from Apple Health so your trackers stay up to date automatically.",
           "NSHealthUpdateUsageDescription": false,
           "background": false
         }
@@ -41,7 +45,22 @@
         {
           "calendarPermission": "Big Bro reads events from your Apple Calendar so they show up alongside your goals, workouts, and prayer times."
         }
-      ]
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Big Bro uses your location to calculate accurate Athan and Iqama prayer times for where you are."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Big Bro uses your camera to capture your one photo journal entry for the day."
+        }
+      ],
+      "@bacons/apple-targets",
+      "expo-background-task",
+      "expo-notifications"
     ]
   }
 }

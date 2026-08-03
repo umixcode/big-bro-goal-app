@@ -30,6 +30,21 @@ export async function getSleepLogByDate(date: string): Promise<SleepLog | null> 
   return data;
 }
 
+export async function getSleepLogsForRange(startDate: string, endDate: string): Promise<SleepLog[]> {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return [];
+
+  const { data, error } = await supabase
+    .from('sleep_logs')
+    .select('*')
+    .eq('user_id', userData.user.id)
+    .gte('date', startDate)
+    .lte('date', endDate);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function upsertSleepLog(input: {
   date: string;
   total_minutes: number;

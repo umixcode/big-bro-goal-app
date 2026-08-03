@@ -4,7 +4,9 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../ui/Card';
 import { MacroWedgeChart } from '../ui/MacroWedgeChart';
-import { useCreateFoodEntry, useDeleteFoodEntry, useFoodEntries } from '../../hooks/useFoodEntries';
+import { GoalHeatmap } from './GoalHeatmap';
+import { SwipeReveal } from './SwipeReveal';
+import { useCreateFoodEntry, useDeleteFoodEntry, useFoodEntries, useFoodHeatmap } from '../../hooks/useFoodEntries';
 import { colors, radii, spacing, typography } from '../../lib/theme';
 
 interface FoodCardProps {
@@ -19,6 +21,7 @@ export function FoodCard({ calorieGoal, proteinGoal, fatGoal, carbsGoal }: FoodC
   const { data: entries = [] } = useFoodEntries(today);
   const createEntry = useCreateFoodEntry(today);
   const deleteEntry = useDeleteFoodEntry(today);
+  const { days } = useFoodHeatmap(calorieGoal);
 
   const [name, setName] = useState('');
   const [calories, setCalories] = useState('');
@@ -54,63 +57,72 @@ export function FoodCard({ calorieGoal, proteinGoal, fatGoal, carbsGoal }: FoodC
   };
 
   return (
-    <Card>
-      <Text style={typography.heading}>Food</Text>
-      <View style={styles.body}>
-        <MacroWedgeChart
-          size={120}
-          strokeWidth={11}
-          wedges={[
-            { label: 'Protein', progress: proteinGoal > 0 ? totals.protein / proteinGoal : 0, color: colors.macroProtein },
-            { label: 'Fat', progress: fatGoal > 0 ? totals.fat / fatGoal : 0, color: colors.macroFat },
-            { label: 'Carbs', progress: carbsGoal > 0 ? totals.carbs / carbsGoal : 0, color: colors.macroCarbs },
-          ]}
-        >
-          <Text style={styles.ringValue}>{Math.round(totals.calories)}</Text>
-          <Text style={typography.caption}>/ {calorieGoal} kcal</Text>
-        </MacroWedgeChart>
-        <View style={styles.legend}>
-          <LegendRow color={colors.macroProtein} label="Protein" value={`${Math.round(totals.protein)} / ${proteinGoal}g`} />
-          <LegendRow color={colors.macroFat} label="Fat" value={`${Math.round(totals.fat)} / ${fatGoal}g`} />
-          <LegendRow color={colors.macroCarbs} label="Carbs" value={`${Math.round(totals.carbs)} / ${carbsGoal}g`} />
-        </View>
-      </View>
-
-      {entries.length > 0 && (
-        <View style={styles.list}>
-          {entries.map((entry) => (
-            <View key={entry.id} style={styles.listRow}>
-              <Text style={typography.body}>{entry.name}</Text>
-              <View style={styles.listRight}>
-                <Text style={typography.caption}>{entry.calories} kcal</Text>
-                <Pressable onPress={() => deleteEntry.mutate(entry.id)}>
-                  <Ionicons name="close-circle-outline" size={18} color={colors.textMuted} />
-                </Pressable>
-              </View>
+    <SwipeReveal
+      front={
+        <Card>
+          <Text style={typography.heading}>Food</Text>
+          <View style={styles.body}>
+            <MacroWedgeChart
+              size={120}
+              strokeWidth={11}
+              wedges={[
+                { label: 'Protein', progress: proteinGoal > 0 ? totals.protein / proteinGoal : 0, color: colors.macroProtein },
+                { label: 'Fat', progress: fatGoal > 0 ? totals.fat / fatGoal : 0, color: colors.macroFat },
+                { label: 'Carbs', progress: carbsGoal > 0 ? totals.carbs / carbsGoal : 0, color: colors.macroCarbs },
+              ]}
+            >
+              <Text style={styles.ringValue}>{Math.round(totals.calories)}</Text>
+              <Text style={typography.caption}>/ {calorieGoal} kcal</Text>
+            </MacroWedgeChart>
+            <View style={styles.legend}>
+              <LegendRow color={colors.macroProtein} label="Protein" value={`${Math.round(totals.protein)} / ${proteinGoal}g`} />
+              <LegendRow color={colors.macroFat} label="Fat" value={`${Math.round(totals.fat)} / ${fatGoal}g`} />
+              <LegendRow color={colors.macroCarbs} label="Carbs" value={`${Math.round(totals.carbs)} / ${carbsGoal}g`} />
             </View>
-          ))}
-        </View>
-      )}
+          </View>
 
-      <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Food name"
-          placeholderTextColor={colors.textMuted}
-          value={name}
-          onChangeText={setName}
-        />
-        <View style={styles.row}>
-          <TextInput style={styles.input} placeholder="kcal" placeholderTextColor={colors.textMuted} keyboardType="numeric" value={calories} onChangeText={setCalories} />
-          <TextInput style={styles.input} placeholder="protein g" placeholderTextColor={colors.textMuted} keyboardType="numeric" value={protein} onChangeText={setProtein} />
-          <TextInput style={styles.input} placeholder="carbs g" placeholderTextColor={colors.textMuted} keyboardType="numeric" value={carbs} onChangeText={setCarbs} />
-          <TextInput style={styles.input} placeholder="fat g" placeholderTextColor={colors.textMuted} keyboardType="numeric" value={fat} onChangeText={setFat} />
-        </View>
-        <Pressable style={styles.button} onPress={onAdd} disabled={createEntry.isPending}>
-          <Text style={styles.buttonText}>{createEntry.isPending ? 'Adding…' : 'Add food'}</Text>
-        </Pressable>
-      </View>
-    </Card>
+          {entries.length > 0 && (
+            <View style={styles.list}>
+              {entries.map((entry) => (
+                <View key={entry.id} style={styles.listRow}>
+                  <Text style={typography.body}>{entry.name}</Text>
+                  <View style={styles.listRight}>
+                    <Text style={typography.caption}>{entry.calories} kcal</Text>
+                    <Pressable onPress={() => deleteEntry.mutate(entry.id)}>
+                      <Ionicons name="close-circle-outline" size={18} color={colors.textMuted} />
+                    </Pressable>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+
+          <View style={styles.form}>
+            <TextInput
+              style={styles.input}
+              placeholder="Food name"
+              placeholderTextColor={colors.textMuted}
+              value={name}
+              onChangeText={setName}
+            />
+            <View style={styles.row}>
+              <TextInput style={styles.input} placeholder="kcal" placeholderTextColor={colors.textMuted} keyboardType="numeric" value={calories} onChangeText={setCalories} />
+              <TextInput style={styles.input} placeholder="protein g" placeholderTextColor={colors.textMuted} keyboardType="numeric" value={protein} onChangeText={setProtein} />
+              <TextInput style={styles.input} placeholder="carbs g" placeholderTextColor={colors.textMuted} keyboardType="numeric" value={carbs} onChangeText={setCarbs} />
+              <TextInput style={styles.input} placeholder="fat g" placeholderTextColor={colors.textMuted} keyboardType="numeric" value={fat} onChangeText={setFat} />
+            </View>
+            <Pressable style={styles.button} onPress={onAdd} disabled={createEntry.isPending}>
+              <Text style={styles.buttonText}>{createEntry.isPending ? 'Adding…' : 'Add food'}</Text>
+            </Pressable>
+          </View>
+        </Card>
+      }
+      back={
+        <Card>
+          <GoalHeatmap title="Food" days={days} />
+        </Card>
+      }
+    />
   );
 }
 

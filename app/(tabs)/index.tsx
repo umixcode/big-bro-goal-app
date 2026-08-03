@@ -4,13 +4,15 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useProfile } from '../../src/hooks/useProfile';
 import { DhikrCounter } from '../../src/components/dhikr/DhikrCounter';
-import { PlannerTaskList } from '../../src/components/planner/PlannerTaskList';
+import { ActionsList } from '../../src/components/actions/ActionsList';
 import { JournalComposer } from '../../src/components/journal/JournalComposer';
+import { CertExpiryCountdown } from '../../src/components/dashboard/CertExpiryCountdown';
 import { ComingSoonCard } from '../../src/components/dashboard/ComingSoonCard';
+import { PrayerTimesCard } from '../../src/components/dashboard/PrayerTimesCard';
 import { WaterRingCard } from '../../src/components/dashboard/WaterRingCard';
 import { CalorieWedgeCard } from '../../src/components/dashboard/CalorieWedgeCard';
 import { WeightTrendCard } from '../../src/components/dashboard/WeightTrendCard';
-import { TodaysGoalsCard } from '../../src/components/goals/TodaysGoalsCard';
+import { GoalsList } from '../../src/components/goals/GoalsList';
 import { MiniCalendarCard } from '../../src/components/calendar/MiniCalendarCard';
 import { supabase } from '../../src/api/supabaseClient';
 import { colors, radii, spacing, typography } from '../../src/lib/theme';
@@ -52,20 +54,20 @@ export default function DashboardScreen() {
 
       <View style={isWide ? styles.columnsRow : undefined}>
         <View style={[styles.column, isWide && styles.columnLeft]}>
-          <JournalComposer />
+          <JournalComposer date={today} />
           <ComingSoonCard title="Salah Tracker" variant="dots" />
           <View style={styles.sideBySide}>
             <WaterRingCard style={styles.half} />
             <CalorieWedgeCard style={styles.half} />
           </View>
           <MiniCalendarCard />
-          <TodaysGoalsCard />
           <WeightTrendCard />
         </View>
 
         <View style={[styles.column, isWide && styles.columnRight]}>
-          <ComingSoonCard title="Salah Time" variant="rows" rows={['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha']} />
-          <PlannerTaskList date={today} />
+          <PrayerTimesCard />
+          <ActionsList date={today} />
+          <GoalsList />
         </View>
       </View>
 
@@ -77,6 +79,8 @@ export default function DashboardScreen() {
       <Pressable style={styles.signOut} onPress={() => supabase.auth.signOut()}>
         <Text style={{ color: colors.danger }}>Sign out</Text>
       </Pressable>
+
+      <CertExpiryCountdown />
     </ScrollView>
   );
 }

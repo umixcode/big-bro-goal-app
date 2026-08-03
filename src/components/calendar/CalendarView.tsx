@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Calendar, type DateData } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 import { useCalendarEvents, useCreateEvent, useDeleteEvent } from '../../hooks/useCalendarEvents';
+import { useActionTaskDates } from '../../hooks/useActionTasks';
 import { useDeviceCalendarEvents } from '../../hooks/useDeviceCalendarEvents';
 import { toDisplayEvents, buildMarkedDates, type DisplayEvent } from '../../lib/calendarMerge';
 import { Card } from '../ui/Card';
@@ -19,14 +20,21 @@ const timingOptions: { value: TimingMode; label: string }[] = [
 
 const WINDOW_START = dayjs().subtract(30, 'day').toDate();
 const WINDOW_END = dayjs().add(90, 'day').toDate();
+const WINDOW_START_DATE = dayjs(WINDOW_START).format('YYYY-MM-DD');
+const WINDOW_END_DATE = dayjs(WINDOW_END).format('YYYY-MM-DD');
 
-export function CalendarView() {
+interface CalendarViewProps {
+  selectedDate: string;
+  onSelectDate: (date: string) => void;
+}
+
+export function CalendarView({ selectedDate, onSelectDate }: CalendarViewProps) {
   const { data: events = [] } = useCalendarEvents();
   const { data: deviceEvents = [] } = useDeviceCalendarEvents(WINDOW_START, WINDOW_END);
+  const { data: actionDates = [] } = useActionTaskDates(WINDOW_START_DATE, WINDOW_END_DATE);
   const createEvent = useCreateEvent();
   const deleteEvent = useDeleteEvent();
 
-  const [selectedDate, setSelectedDate] = useState(dayjs().format('YYYY-MM-DD'));
   const [title, setTitle] = useState('');
   const [timing, setTiming] = useState<TimingMode>('all_day');
   const [time, setTime] = useState('');
@@ -43,8 +51,8 @@ export function CalendarView() {
   }, [displayEvents]);
 
   const markedDates = useMemo(
-    () => buildMarkedDates(displayEvents, selectedDate),
-    [displayEvents, selectedDate]
+    () => buildMarkedDates(displayEvents, selectedDate, actionDates),
+    [displayEvents, selectedDate, actionDates]
   );
 
   const dayEvents = eventsByDate[selectedDate] ?? [];
@@ -76,7 +84,7 @@ export function CalendarView() {
       <Card style={styles.calendarCard}>
         <Calendar
           current={selectedDate}
-          onDayPress={(day: DateData) => setSelectedDate(day.dateString)}
+          onDayPress={(day: DateData) => onSelectDate(day.dateString)}
           markedDates={markedDates}
           theme={calendarTheme}
         />

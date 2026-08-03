@@ -1,16 +1,38 @@
-export const colors = {
-  background: '#1A1B1E',
-  surface: '#232428',
-  surfaceRaised: '#2C2D32',
-  border: '#3A3B40',
-  textPrimary: '#F5F5F5',
-  textSecondary: '#A8A9AD',
-  textMuted: '#6E6F74',
-  accent: '#FFFFFF',
-  onAccent: '#1A1B1E',
-  success: '#4CAF7D',
+import { Platform } from 'react-native';
+
+// The dark/mint/serif look that started in the workout section is now the
+// app-wide palette — `colors`/`typography` below derive straight from it, so
+// every screen picks it up automatically since they already read from these
+// shared tokens.
+export const workoutTheme = {
+  background: '#050D09',
+  surface: '#0C1611',
+  surfaceRaised: '#122019',
+  border: '#1E2E25',
+  accent: '#6EE7B7',
+  accentMuted: 'rgba(110, 231, 183, 0.35)',
+  textPrimary: '#F3F4F0',
+  textSecondary: '#9BA79E',
+  textMuted: '#5C6961',
+  danger: '#E0705A',
   warning: '#E0A93A',
-  danger: '#E0553A',
+  fontSerif: Platform.select({ ios: 'Georgia', android: 'serif', default: 'Georgia' }),
+  fontMono: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'Menlo' }),
+} as const;
+
+export const colors = {
+  background: workoutTheme.background,
+  surface: workoutTheme.surface,
+  surfaceRaised: workoutTheme.surfaceRaised,
+  border: workoutTheme.border,
+  textPrimary: workoutTheme.textPrimary,
+  textSecondary: workoutTheme.textSecondary,
+  textMuted: workoutTheme.textMuted,
+  accent: workoutTheme.accent,
+  onAccent: workoutTheme.background,
+  success: workoutTheme.accent,
+  warning: workoutTheme.warning,
+  danger: workoutTheme.danger,
   macroCarbs: '#E8C547',
   macroFat: '#4CAF7D',
   macroProtein: '#E0553A',
@@ -32,18 +54,19 @@ export const radii = {
 } as const;
 
 export const typography = {
-  title: { fontSize: 28, fontWeight: '700' as const, color: colors.textPrimary },
-  heading: { fontSize: 20, fontWeight: '600' as const, color: colors.textPrimary },
+  title: { fontSize: 28, fontWeight: '700' as const, fontFamily: workoutTheme.fontSerif, color: colors.textPrimary },
+  heading: { fontSize: 20, fontWeight: '600' as const, fontFamily: workoutTheme.fontSerif, color: colors.textPrimary },
   body: { fontSize: 16, fontWeight: '400' as const, color: colors.textPrimary },
   caption: { fontSize: 13, fontWeight: '400' as const, color: colors.textSecondary },
   eyebrow: {
     fontSize: 11,
     fontWeight: '700' as const,
+    fontFamily: workoutTheme.fontMono,
     letterSpacing: 1.2,
     textTransform: 'uppercase' as const,
     color: colors.textMuted,
   },
-  statLarge: { fontSize: 34, fontWeight: '700' as const, color: colors.textPrimary },
+  statLarge: { fontSize: 34, fontWeight: '700' as const, fontFamily: workoutTheme.fontSerif, color: colors.textPrimary },
 };
 
 export const gradients = {
@@ -63,4 +86,6 @@ export const calendarTheme = {
   selectedDotColor: colors.onAccent,
   arrowColor: colors.accent,
   textDisabledColor: colors.textMuted,
+  textMonthFontFamily: workoutTheme.fontSerif,
+  textDayHeaderFontFamily: workoutTheme.fontMono,
 } as const;

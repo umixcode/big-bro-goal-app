@@ -27,6 +27,21 @@ export async function listFoodEntriesByDate(date: string): Promise<FoodEntry[]> 
   return data ?? [];
 }
 
+export async function getFoodEntriesForRange(startDate: string, endDate: string): Promise<FoodEntry[]> {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return [];
+
+  const { data, error } = await supabase
+    .from('food_entries')
+    .select('*')
+    .eq('user_id', userData.user.id)
+    .gte('date', startDate)
+    .lte('date', endDate);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function createFoodEntry(input: {
   date: string;
   name: string;

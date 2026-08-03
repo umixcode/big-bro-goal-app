@@ -38,6 +38,21 @@ export async function getStepsLogByDate(date: string): Promise<StepsLog | null> 
   return data;
 }
 
+export async function getStepsLogsForRange(startDate: string, endDate: string): Promise<StepsLog[]> {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return [];
+
+  const { data, error } = await supabase
+    .from('steps_logs')
+    .select('*')
+    .eq('user_id', userData.user.id)
+    .gte('date', startDate)
+    .lte('date', endDate);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export async function upsertStepsLog(input: {
   date: string;
   steps: number;

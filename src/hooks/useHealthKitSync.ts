@@ -42,32 +42,47 @@ export function useHealthKitSync() {
 
       if (cancelled) return;
 
+      // Each sync is independent — one failing (e.g. a bad value HealthKit
+      // returns) must not block the others from saving.
       if (weight.status === 'fulfilled' && weight.value) {
-        await upsertWeightLog({ date: weight.value.date, weight_kg: weight.value.weightKg, source: 'healthkit' });
-        queryClient.invalidateQueries({ queryKey: ['weightLogs'] });
+        try {
+          await upsertWeightLog({ date: weight.value.date, weight_kg: weight.value.weightKg, source: 'healthkit' });
+          queryClient.invalidateQueries({ queryKey: ['weightLogs'] });
+        } catch {
+          // Best-effort background sync — surfacing this would just be noise
+          // on every tab open; manual entry remains available as a fallback.
+        }
       }
 
       if (steps.status === 'fulfilled') {
-        await upsertStepsLog({ date: today, steps: steps.value, source: 'healthkit' });
-        queryClient.invalidateQueries({ queryKey: ['stepsLog', today] });
+        try {
+          await upsertStepsLog({ date: today, steps: steps.value, source: 'healthkit' });
+          queryClient.invalidateQueries({ queryKey: ['stepsLog', today] });
+        } catch {
+          // See weight sync above.
+        }
       }
 
       if (sleep.status === 'fulfilled' && sleep.value) {
         const aggregate = sleep.value;
         const sleepGoalHours = goals?.sleep_goal_hours ?? 8;
-        await upsertSleepLog({
-          date: aggregate.date,
-          total_minutes: aggregate.total_minutes,
-          rem_minutes: aggregate.rem_minutes,
-          light_minutes: aggregate.light_minutes,
-          deep_minutes: aggregate.deep_minutes,
-          awake_minutes: aggregate.awake_minutes,
-          start_time: aggregate.start_time,
-          end_time: aggregate.end_time,
-          score: calculateSleepScore(aggregate.total_minutes, sleepGoalHours),
-          source: 'healthkit',
-        });
-        queryClient.invalidateQueries({ queryKey: ['sleepLog', aggregate.date] });
+        try {
+          await upsertSleepLog({
+            date: aggregate.date,
+            total_minutes: aggregate.total_minutes,
+            rem_minutes: aggregate.rem_minutes,
+            light_minutes: aggregate.light_minutes,
+            deep_minutes: aggregate.deep_minutes,
+            awake_minutes: aggregate.awake_minutes,
+            start_time: aggregate.start_time,
+            end_time: aggregate.end_time,
+            score: calculateSleepScore(aggregate.total_minutes, sleepGoalHours),
+            source: 'healthkit',
+          });
+          queryClient.invalidateQueries({ queryKey: ['sleepLog', aggregate.date] });
+        } catch {
+          // See weight sync above.
+        }
       }
     })();
 

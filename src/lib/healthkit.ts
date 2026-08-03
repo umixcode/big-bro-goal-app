@@ -12,6 +12,7 @@ import { aggregateSleepSamples, type SleepAggregate } from './sleepAggregation';
 const READ_TYPES = [
   'HKQuantityTypeIdentifierBodyMass',
   'HKQuantityTypeIdentifierStepCount',
+  'HKQuantityTypeIdentifierActiveEnergyBurned',
   'HKCategoryTypeIdentifierSleepAnalysis',
 ] as const;
 
@@ -33,17 +34,41 @@ export async function getLatestWeightKg(): Promise<{ weightKg: number; date: str
   return { weightKg: sample.quantity, date: dayjs(sample.endDate).format('YYYY-MM-DD') };
 }
 
-export async function getTodayStepTotal(): Promise<number> {
-  const startOfDay = dayjs().startOf('day').toDate();
-  const now = new Date();
+export async function getStepTotalForDate(date: string): Promise<number> {
+  const startOfDay = dayjs(date).startOf('day').toDate();
+  const endOfDay = dayjs(date).endOf('day').toDate();
 
   const stats = await queryStatisticsForQuantity(
     'HKQuantityTypeIdentifierStepCount',
     ['cumulativeSum'],
-    { filter: { date: { startDate: startOfDay, endDate: now } }, unit: 'count' }
+    { filter: { date: { startDate: startOfDay, endDate: endOfDay } }, unit: 'count' }
+  );
+
+  // steps_logs.steps is a Postgres int — HealthKit's summed count can come
+  // back as a float (floating-point accumulation across samples), which
+  // Postgres rejects outright rather than truncating.
+  return Math.round(stats.sumQuantity?.quantity ?? 0);
+}
+
+export async function getActiveEnergyBurnedForDate(date: string): Promise<number> {
+  const startOfDay = dayjs(date).startOf('day').toDate();
+  const endOfDay = dayjs(date).endOf('day').toDate();
+
+  const stats = await queryStatisticsForQuantity(
+    'HKQuantityTypeIdentifierActiveEnergyBurned',
+    ['cumulativeSum'],
+    { filter: { date: { startDate: startOfDay, endDate: endOfDay } }, unit: 'kcal' }
   );
 
   return stats.sumQuantity?.quantity ?? 0;
+}
+
+export async function getTodayStepTotal(): Promise<number> {
+  return getStepTotalForDate(dayjs().format('YYYY-MM-DD'));
+}
+
+export async function getTodayActiveEnergyBurned(): Promise<number> {
+  return getActiveEnergyBurnedForDate(dayjs().format('YYYY-MM-DD'));
 }
 
 export async function getLastNightSleepAggregate(): Promise<SleepAggregate | null> {

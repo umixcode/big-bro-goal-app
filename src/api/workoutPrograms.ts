@@ -22,6 +22,7 @@ export interface WorkoutPhaseExercise {
   phase_day_id: string;
   exercise_order: number;
   exercise_name: string;
+  original_exercise_name: string | null;
   last_set_intensity_technique: string | null;
   warm_up_sets: string | null;
   working_sets: number | null;
@@ -66,4 +67,23 @@ export async function listPhaseDayExercises(phaseDayId: string): Promise<Workout
 
   if (error) throw error;
   return data ?? [];
+}
+
+export async function swapPhaseExercise(
+  phaseExerciseId: string,
+  newExerciseName: string,
+  originalExerciseName: string
+): Promise<WorkoutPhaseExercise> {
+  const { data, error } = await supabase
+    .from('workout_phase_exercises')
+    .update({
+      exercise_name: newExerciseName,
+      original_exercise_name: newExerciseName === originalExerciseName ? null : originalExerciseName,
+    })
+    .eq('id', phaseExerciseId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
 }

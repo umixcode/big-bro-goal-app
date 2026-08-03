@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useCreateGoal, useGoals, useUpdateGoal } from '../../hooks/useGoals';
-import type { GoalCategory, GoalStatus } from '../../api/goals';
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useCreateGoal, useDeleteGoal, useGoals, useUpdateGoal } from '../../hooks/useGoals';
+import type { Goal, GoalCategory, GoalStatus } from '../../api/goals';
 import { Card } from '../ui/Card';
 import { ChipSelect } from '../ui/ChipSelect';
 import { colors, radii, spacing, typography } from '../../lib/theme';
@@ -26,6 +27,7 @@ export function GoalsList() {
   const { data: goals = [] } = useGoals();
   const createGoal = useCreateGoal();
   const updateGoal = useUpdateGoal();
+  const deleteGoal = useDeleteGoal();
 
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<GoalCategory>('custom');
@@ -36,6 +38,13 @@ export function GoalsList() {
     createGoal.mutate({ title: trimmed, category });
     setTitle('');
     setCategory('custom');
+  };
+
+  const onDelete = (goal: Goal) => {
+    Alert.alert('Delete goal', `Remove "${goal.title}"?`, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => deleteGoal.mutate(goal.id) },
+    ]);
   };
 
   return (
@@ -65,7 +74,12 @@ export function GoalsList() {
         )}
         {goals.map((goal) => (
           <Card key={goal.id}>
-            <Text style={typography.body}>{goal.title}</Text>
+            <View style={styles.goalHeader}>
+              <Text style={[typography.body, { flex: 1 }]}>{goal.title}</Text>
+              <Pressable onPress={() => onDelete(goal)} hitSlop={8} disabled={deleteGoal.isPending}>
+                <Ionicons name="trash-outline" size={18} color={colors.textMuted} />
+              </Pressable>
+            </View>
             <Text style={[typography.caption, { marginTop: spacing.xs }]}>
               {categoryOptions.find((c) => c.value === goal.category)?.label ?? goal.category}
             </Text>
@@ -84,6 +98,7 @@ export function GoalsList() {
 }
 
 const styles = StyleSheet.create({
+  goalHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   input: {
     backgroundColor: colors.surfaceRaised,
     borderColor: colors.border,

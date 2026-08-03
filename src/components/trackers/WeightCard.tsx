@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Card } from '../ui/Card';
 import { SyncedBadge } from '../ui/SyncedBadge';
-import { useUpsertWeightLog, useWeightLogs } from '../../hooks/useWeightLogs';
+import { WeightTrendChart } from '../ui/WeightTrendChart';
+import { useDeleteWeightLog, useUpsertWeightLog, useWeightLogs } from '../../hooks/useWeightLogs';
 import { useProfile, useUpsertProfile } from '../../hooks/useProfile';
 import { formatWeight, parseWeightToKg } from '../../lib/units';
 import { colors, radii, spacing, typography } from '../../lib/theme';
@@ -12,17 +14,15 @@ export function WeightCard() {
   const today = dayjs().format('YYYY-MM-DD');
   const { data: profile } = useProfile();
   const upsertProfile = useUpsertProfile();
-  const { data: logs = [] } = useWeightLogs(14);
+  const { data: logs = [] } = useWeightLogs(30);
   const upsertWeight = useUpsertWeightLog();
+  const deleteWeight = useDeleteWeightLog();
   const [value, setValue] = useState('');
 
   const unitsPreference = profile?.units_preference ?? 'imperial';
   const unitLabel = unitsPreference === 'metric' ? 'kg' : 'lb';
   const latest = logs[0] ?? null;
   const chronological = [...logs].reverse();
-  const maxWeight = Math.max(...chronological.map((l) => l.weight_kg), 1);
-  const minWeight = Math.min(...chronological.map((l) => l.weight_kg), maxWeight);
-  const range = maxWeight - minWeight || 1;
 
   const onSave = () => {
     const numeric = Number(value);
@@ -30,6 +30,13 @@ export function WeightCard() {
     const weightKg = parseWeightToKg(numeric, unitsPreference);
     upsertWeight.mutate({ date: today, weight_kg: weightKg }, { onSuccess: () => setValue('') });
     upsertProfile.mutate({ current_weight_kg: weightKg });
+  };
+
+  const onDelete = (id: string, date: string) => {
+    Alert.alert('Delete entry', `Remove the weight logged on ${dayjs(date).format('MMM D, YYYY')}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: () => deleteWeight.mutate(id) },
+    ]);
   };
 
   return (
@@ -41,11 +48,8 @@ export function WeightCard() {
       {latest?.source === 'healthkit' && <SyncedBadge />}
 
       {chronological.length > 1 && (
-        <View style={styles.sparkline}>
-          {chronological.map((log) => {
-            const heightPct = ((log.weight_kg - minWeight) / range) * 0.8 + 0.2;
-            return <View key={log.id} style={[styles.bar, { height: `${heightPct * 100}%` }]} />;
-          })}
+        <View style={{ marginTop: spacing.sm }}>
+          <WeightTrendChart logs={chronological} unitsPreference={unitsPreference} />
         </View>
       )}
 
@@ -62,13 +66,31 @@ export function WeightCard() {
           <Text style={styles.buttonText}>{upsertWeight.isPending ? 'Saving…' : 'Log weight'}</Text>
         </Pressable>
       </View>
+
+      {logs.length > 0 && (
+        <View style={styles.history}>
+          <Text style={[typography.eyebrow, { marginBottom: spacing.xs }]}>History</Text>
+          {logs.map((log) => (
+            <View key={log.id} style={styles.historyRow}>
+              <Text style={styles.historyDate}>{dayjs(log.date).format('MMM D, YYYY')}</Text>
+              <View style={styles.historyValueGroup}>
+                <Text style={styles.historyValue}>
+                  {formatWeight(log.weight_kg, unitsPreference)} {unitLabel}
+                </Text>
+                {log.source === 'healthkit' && <SyncedBadge />}
+              </View>
+              <Pressable onPress={() => onDelete(log.id, log.date)} hitSlop={8} disabled={deleteWeight.isPending}>
+                <Ionicons name="trash-outline" size={16} color={colors.textMuted} />
+              </Pressable>
+            </View>
+          ))}
+        </View>
+      )}
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  sparkline: { flexDirection: 'row', alignItems: 'flex-end', gap: 3, height: 40, marginTop: spacing.sm },
-  bar: { flex: 1, backgroundColor: colors.accent, borderRadius: 2, minHeight: 4 },
   row: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
   input: {
     flex: 1,
@@ -87,4 +109,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: { color: colors.onAccent, fontWeight: '600' },
+  history: {
+    marginTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingTop: spacing.sm,
+  },
+  historyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.xs,
+  },
+  historyDate: { ...typography.caption, flex: 1 },
+  historyValueGroup: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginRight: spacing.sm },
+  historyValue: { ...typography.body, fontSize: 14 },
 });

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createGoal, listGoals, updateGoal, type Goal } from '../api/goals';
+import { createGoal, deleteGoal, listGoals, updateGoal, type Goal } from '../api/goals';
 
 export function useGoals() {
   return useQuery({ queryKey: ['goals'], queryFn: listGoals });
@@ -18,6 +18,14 @@ export function useUpdateGoal() {
   return useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: Partial<Omit<Goal, 'id' | 'user_id' | 'created_at'>> }) =>
       updateGoal(id, patch),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
+  });
+}
+
+export function useDeleteGoal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteGoal(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
   });
 }

@@ -3,7 +3,9 @@ import dayjs from 'dayjs';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Card } from '../ui/Card';
 import { CircularProgressRing } from '../ui/CircularProgressRing';
-import { useAddWaterLog, useWaterLogs } from '../../hooks/useWaterLogs';
+import { GoalHeatmap } from './GoalHeatmap';
+import { SwipeReveal } from './SwipeReveal';
+import { useAddWaterLog, useWaterHeatmap, useWaterLogs } from '../../hooks/useWaterLogs';
 import { colors, radii, spacing, typography } from '../../lib/theme';
 
 interface WaterCardProps {
@@ -16,6 +18,7 @@ export function WaterCard({ waterGoalMl, cupMl, bottleMl }: WaterCardProps) {
   const today = dayjs().format('YYYY-MM-DD');
   const { totalMl } = useWaterLogs(today);
   const addWater = useAddWaterLog(today);
+  const { days } = useWaterHeatmap(waterGoalMl);
   const [customMl, setCustomMl] = useState('');
 
   const progress = waterGoalMl > 0 ? totalMl / waterGoalMl : 0;
@@ -27,38 +30,47 @@ export function WaterCard({ waterGoalMl, cupMl, bottleMl }: WaterCardProps) {
   };
 
   return (
-    <Card>
-      <Text style={typography.heading}>Water</Text>
-      <View style={styles.body}>
-        <CircularProgressRing progress={progress} size={100} strokeWidth={10}>
-          <Text style={styles.ringValue}>{totalMl}</Text>
-          <Text style={typography.caption}>/ {waterGoalMl}ml</Text>
-        </CircularProgressRing>
-        <View style={styles.form}>
-          <View style={styles.row}>
-            <Pressable style={styles.quickAdd} onPress={() => addWater.mutate(cupMl)}>
-              <Text style={styles.quickAddText}>+ Cup ({cupMl}ml)</Text>
-            </Pressable>
-            <Pressable style={styles.quickAdd} onPress={() => addWater.mutate(bottleMl)}>
-              <Text style={styles.quickAddText}>+ Bottle ({bottleMl}ml)</Text>
-            </Pressable>
+    <SwipeReveal
+      front={
+        <Card>
+          <Text style={typography.heading}>Water</Text>
+          <View style={styles.body}>
+            <CircularProgressRing progress={progress} size={100} strokeWidth={10}>
+              <Text style={styles.ringValue}>{totalMl}</Text>
+              <Text style={typography.caption}>/ {waterGoalMl}ml</Text>
+            </CircularProgressRing>
+            <View style={styles.form}>
+              <View style={styles.row}>
+                <Pressable style={styles.quickAdd} onPress={() => addWater.mutate(cupMl)}>
+                  <Text style={styles.quickAddText}>+ Cup ({cupMl}ml)</Text>
+                </Pressable>
+                <Pressable style={styles.quickAdd} onPress={() => addWater.mutate(bottleMl)}>
+                  <Text style={styles.quickAddText}>+ Bottle ({bottleMl}ml)</Text>
+                </Pressable>
+              </View>
+              <View style={styles.row}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Custom ml"
+                  placeholderTextColor={colors.textMuted}
+                  keyboardType="numeric"
+                  value={customMl}
+                  onChangeText={setCustomMl}
+                />
+                <Pressable style={styles.addButton} onPress={onAddCustom} disabled={addWater.isPending}>
+                  <Text style={styles.buttonText}>Add</Text>
+                </Pressable>
+              </View>
+            </View>
           </View>
-          <View style={styles.row}>
-            <TextInput
-              style={styles.input}
-              placeholder="Custom ml"
-              placeholderTextColor={colors.textMuted}
-              keyboardType="numeric"
-              value={customMl}
-              onChangeText={setCustomMl}
-            />
-            <Pressable style={styles.addButton} onPress={onAddCustom} disabled={addWater.isPending}>
-              <Text style={styles.buttonText}>Add</Text>
-            </Pressable>
-          </View>
-        </View>
-      </View>
-    </Card>
+        </Card>
+      }
+      back={
+        <Card>
+          <GoalHeatmap title="Water" days={days} />
+        </Card>
+      }
+    />
   );
 }
 
