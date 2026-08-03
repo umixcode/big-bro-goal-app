@@ -6,6 +6,10 @@ export interface StepsLog {
   date: string;
   steps: number;
   source: 'healthkit' | 'manual';
+  distance_m: number | null;
+  floors_climbed: number | null;
+  active_minutes: number | null;
+  active_calories: number | null;
 }
 
 export async function listStepsLogs(limit = 14): Promise<StepsLog[]> {
@@ -57,6 +61,10 @@ export async function upsertStepsLog(input: {
   date: string;
   steps: number;
   source?: 'healthkit' | 'manual';
+  distance_m?: number | null;
+  floors_climbed?: number | null;
+  active_minutes?: number | null;
+  active_calories?: number | null;
 }): Promise<StepsLog> {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) throw new Error('Not signed in');

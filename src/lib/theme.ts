@@ -73,6 +73,13 @@ export const gradients = {
   accent: [colors.accent, 'rgba(255, 255, 255, 0)'] as const,
 };
 
+export const sleepStageColors = {
+  deep: '#5B8DEF',
+  light: '#7FD8D0',
+  rem: '#9B87F5',
+  awake: workoutTheme.warning,
+} as const;
+
 export const calendarTheme = {
   backgroundColor: colors.surface,
   calendarBackground: colors.surface,

@@ -20,3 +20,17 @@ export function formatHeight(cm: number | null | undefined, unitsPreference: 'me
 export function parseHeightToCm(value: number, unitsPreference: 'metric' | 'imperial'): number {
   return unitsPreference === 'metric' ? value : inToCm(value);
 }
+
+export function formatDurationHM(totalMinutes: number): string {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = Math.round(totalMinutes % 60);
+  if (hours <= 0) return `${minutes}m`;
+  return `${hours}h ${minutes}m`;
+}
+
+const METERS_PER_MILE = 1609.344;
+
+export function formatDistance(meters: number, unitsPreference: 'metric' | 'imperial'): string {
+  if (unitsPreference === 'metric') return `${(meters / 1000).toFixed(2)} km`;
+  return `${(meters / METERS_PER_MILE).toFixed(2)} mi`;
+}

@@ -35,7 +35,7 @@
       [
         "@kingstinct/react-native-healthkit",
         {
-          "NSHealthShareUsageDescription": "Big Bro reads your sleep, weight, step, and active energy data from Apple Health so your trackers stay up to date automatically.",
+          "NSHealthShareUsageDescription": "Big Bro reads your sleep, weight, steps, distance, flights climbed, exercise time, active energy, heart rate, HRV, breathing rate, and outdoor walk/run routes from Apple Health so your trackers stay up to date automatically.",
           "NSHealthUpdateUsageDescription": false,
           "background": false
         }

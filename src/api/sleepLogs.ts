@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import type { SleepStageSegment } from '../lib/sleepAggregation';
 
 export interface SleepLog {
   id: string;
@@ -13,6 +14,10 @@ export interface SleepLog {
   start_time: string | null;
   end_time: string | null;
   score: number | null;
+  avg_heart_rate_bpm: number | null;
+  avg_hrv_ms: number | null;
+  avg_respiratory_rate: number | null;
+  stage_segments: SleepStageSegment[] | null;
 }
 
 export async function getSleepLogByDate(date: string): Promise<SleepLog | null> {
@@ -56,6 +61,10 @@ export async function upsertSleepLog(input: {
   start_time?: string | null;
   end_time?: string | null;
   source?: 'healthkit' | 'manual';
+  avg_heart_rate_bpm?: number | null;
+  avg_hrv_ms?: number | null;
+  avg_respiratory_rate?: number | null;
+  stage_segments?: SleepStageSegment[] | null;
 }): Promise<SleepLog> {
   const { data: userData } = await supabase.auth.getUser();
   if (!userData.user) throw new Error('Not signed in');

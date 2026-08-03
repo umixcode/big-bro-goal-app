@@ -18,7 +18,7 @@ import { supabase } from '../../src/api/supabaseClient';
 import { colors, radii, spacing, typography } from '../../src/lib/theme';
 
 const navPills = [
-  { href: '/(tabs)/trackers', icon: 'moon', label: 'Sleep' },
+  { href: '/(tabs)/trackers/sleep', icon: 'moon', label: 'Sleep' },
   { href: '/(tabs)/trackers', icon: 'restaurant', label: 'Food' },
   { href: '/(tabs)/workout', icon: 'barbell', label: 'Workout' },
 ] as const;

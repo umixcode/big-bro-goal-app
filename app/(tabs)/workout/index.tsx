@@ -170,7 +170,13 @@ export default function WorkoutScreen() {
           {!isToday && !isFuture && pastSessions.length > 0 && (
             <>
               <Text style={styles.heroTitle}>{shortDayName(pastSessions[0].dayName ?? 'Workout')} day</Text>
-              <Text style={styles.restSubtitle}>View past workout</Text>
+              <Pressable
+                style={styles.viewPastRow}
+                onPress={() => router.push({ pathname: '/workout/past/[date]', params: { date: selectedDate } })}
+              >
+                <Text style={styles.restSubtitle}>View past workout</Text>
+                <Ionicons name="chevron-forward" size={14} color={workoutTheme.textSecondary} />
+              </Pressable>
             </>
           )}
           {!isToday && !isFuture && pastSessions.length === 0 && (
@@ -266,6 +272,11 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     fontSize: 15,
     color: workoutTheme.textSecondary,
+  },
+  viewPastRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   startButton: {
     backgroundColor: workoutTheme.accent,

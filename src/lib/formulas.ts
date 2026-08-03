@@ -93,6 +93,22 @@ export function calculateSleepScore(totalMinutesAsleep: number, sleepGoalHours: 
   return Math.round(100 * Math.min(ratio, 1));
 }
 
+export function getStepsStatusMessage(steps: number, stepGoal: number, weeklyAvgSteps: number): string {
+  if (stepGoal > 0 && steps >= stepGoal) return "Goal reached — you're crushing it today.";
+  if (weeklyAvgSteps > 0 && steps >= weeklyAvgSteps) return "You're pacing ahead of your weekly average.";
+  if (stepGoal <= 0) return 'Keep moving today.';
+  const percent = Math.round((steps / stepGoal) * 100);
+  return `Keep it up — you're at ${percent}% of your goal.`;
+}
+
+export function getSleepStatus(score: number): { label: string; message: string } {
+  if (score >= 90) return { label: 'Excellent', message: 'You had a deeply restful night.' };
+  if (score >= 75) return { label: 'Great', message: 'You had a restful night and your body is well rested.' };
+  if (score >= 60) return { label: 'Good', message: 'A solid night, just a bit short of your goal.' };
+  if (score >= 40) return { label: 'Fair', message: 'You came up short on sleep — try winding down earlier tonight.' };
+  return { label: 'Poor', message: 'You got very little rest last night.' };
+}
+
 export function estimateOneRepMax(weight: number, reps: number): number {
   return weight * (1 + reps / 30);
 }

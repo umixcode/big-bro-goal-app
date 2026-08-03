@@ -6,7 +6,14 @@ import {
   ensureHealthKitAuthorized,
   getLatestWeightKg,
   getTodayStepTotal,
+  getDistanceForDate,
+  getFlightsClimbedForDate,
+  getExerciseMinutesForDate,
+  getActiveEnergyBurnedForDate,
   getLastNightSleepAggregate,
+  getAverageHeartRateForRange,
+  getAverageHRVForRange,
+  getAverageRespiratoryRateForRange,
 } from '../lib/healthkit';
 import { upsertWeightLog } from '../api/weightLogs';
 import { upsertStepsLog } from '../api/stepsLogs';
@@ -34,9 +41,13 @@ export function useHealthKitSync() {
 
       const today = dayjs().format('YYYY-MM-DD');
 
-      const [weight, steps, sleep] = await Promise.allSettled([
+      const [weight, steps, distance, floors, exerciseMinutes, activeCalories, sleep] = await Promise.allSettled([
         getLatestWeightKg(),
         getTodayStepTotal(),
+        getDistanceForDate(today),
+        getFlightsClimbedForDate(today),
+        getExerciseMinutesForDate(today),
+        getActiveEnergyBurnedForDate(today),
         getLastNightSleepAggregate(),
       ]);
 
@@ -56,7 +67,15 @@ export function useHealthKitSync() {
 
       if (steps.status === 'fulfilled') {
         try {
-          await upsertStepsLog({ date: today, steps: steps.value, source: 'healthkit' });
+          await upsertStepsLog({
+            date: today,
+            steps: steps.value,
+            source: 'healthkit',
+            distance_m: distance.status === 'fulfilled' ? distance.value : null,
+            floors_climbed: floors.status === 'fulfilled' ? floors.value : null,
+            active_minutes: exerciseMinutes.status === 'fulfilled' ? exerciseMinutes.value : null,
+            active_calories: activeCalories.status === 'fulfilled' ? activeCalories.value : null,
+          });
           queryClient.invalidateQueries({ queryKey: ['stepsLog', today] });
         } catch {
           // See weight sync above.
@@ -66,6 +85,17 @@ export function useHealthKitSync() {
       if (sleep.status === 'fulfilled' && sleep.value) {
         const aggregate = sleep.value;
         const sleepGoalHours = goals?.sleep_goal_hours ?? 8;
+
+        // Heart rate/HRV/breathing are queried scoped to the sleep window
+        // itself (not the calendar day), so they only need to run once the
+        // window is known — same best-effort, independent-failure handling
+        // as the syncs above.
+        const [heartRate, hrv, respiratoryRate] = await Promise.allSettled([
+          getAverageHeartRateForRange(aggregate.start_time, aggregate.end_time),
+          getAverageHRVForRange(aggregate.start_time, aggregate.end_time),
+          getAverageRespiratoryRateForRange(aggregate.start_time, aggregate.end_time),
+        ]);
+
         try {
           await upsertSleepLog({
             date: aggregate.date,
@@ -78,6 +108,10 @@ export function useHealthKitSync() {
             end_time: aggregate.end_time,
             score: calculateSleepScore(aggregate.total_minutes, sleepGoalHours),
             source: 'healthkit',
+            avg_heart_rate_bpm: heartRate.status === 'fulfilled' ? heartRate.value : null,
+            avg_hrv_ms: hrv.status === 'fulfilled' ? hrv.value : null,
+            avg_respiratory_rate: respiratoryRate.status === 'fulfilled' ? respiratoryRate.value : null,
+            stage_segments: aggregate.segments,
           });
           queryClient.invalidateQueries({ queryKey: ['sleepLog', aggregate.date] });
         } catch {
