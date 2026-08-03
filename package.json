@@ -59,6 +59,7 @@
     "android": "expo start --dev-client --android",
     "ios": "expo start --dev-client --ios",
     "web": "expo start --web",
+    "build:web": "expo export --platform web",
     "import:workout-program": "tsx scripts/import-workout-program.ts",
     "release:ios": "tsx scripts/write-build-date.ts && expo run:ios --configuration Release"
   },
