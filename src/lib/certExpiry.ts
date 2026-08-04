@@ -1,5 +1,6 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import * as Notifications from 'expo-notifications';
+import { Platform } from 'react-native';
 import { BUILD_DATE } from './buildInfo';
 
 // Free (non-Program) Apple ID signing certificates expire 7 days after the
@@ -14,6 +15,10 @@ export function getCertExpiryDate(): Dayjs {
 }
 
 export async function scheduleCertExpiryReminder(): Promise<void> {
+  // The free Apple ID cert-expiry/USB-reinstall workflow only applies to
+  // native iOS installs — expo-notifications can't schedule on web at all.
+  if (Platform.OS === 'web') return;
+
   const expiresAt = getCertExpiryDate();
   const remindAt = expiresAt.subtract(REMINDER_LEAD_HOURS, 'hour');
 
